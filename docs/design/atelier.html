@@ -1,0 +1,628 @@
+<meta charset="utf-8">
+<title>Atelier Garantix</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Chivo+Mono:wght@400;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Atelier : colonne de lecture à gauche, banc d'essai collant à droite ; le chrome reste neutre, les prototypes portent l'audace. */
+:root {
+  --bg: #f3f3f1;
+  --surface: #ffffff;
+  --fg: #1a1b1d;
+  --fg-2: #55575c;
+  --rule: #d6d6d2;
+  --focus: #2350c8;
+  --ok: #1f6a3f;
+  --ko: #b3261e;
+  --chrome-text: "Atkinson Hyperlegible", system-ui, sans-serif;
+  --chrome-mono: "IBM Plex Mono", ui-monospace, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #141517; --surface: #1d1e21; --fg: #ececea; --fg-2: #a9abb0; --rule: #34363a; --focus: #8fb0ff; --ok: #7fd1a0; --ko: #ff8a7a; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #141517; --surface: #1d1e21; --fg: #ececea; --fg-2: #a9abb0; --rule: #34363a; --focus: #8fb0ff; --ok: #7fd1a0; --ko: #ff8a7a; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--chrome-text); font-size: 1rem; line-height: 1.55; margin: 0; }
+a { color: inherit; text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+h1, h2, h3 { line-height: 1.15; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+.wrap { max-width: 92rem; margin: 0 auto; padding-block: 2.5rem 4rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 3rem; }
+.eyebrow { font-family: var(--chrome-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-2); }
+.intro { display: grid; gap: 1rem; max-width: 46rem; }
+.intro h1 { font-size: clamp(1.9rem, 4.5vw, 3rem); font-weight: 700; letter-spacing: -0.02em; }
+.intro p { color: var(--fg-2); max-width: 65ch; }
+
+.section { display: grid; gap: 1.25rem; }
+.section > h2 { font-size: 1.5rem; }
+.diag { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 1rem; }
+.diag article { background: var(--surface); border: 1px solid var(--rule); padding: 1.25rem; display: grid; gap: 0.6rem; align-content: start; }
+.diag h3 { font-size: 1rem; }
+.diag ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.4rem; color: var(--fg-2); }
+.diag strong { color: var(--fg); }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; border-bottom: 1px solid var(--rule); }
+.tab { font: inherit; background: none; border: 0; border-bottom: 3px solid transparent; color: var(--fg-2); padding: 0.7rem 0.9rem; cursor: pointer; display: grid; text-align: left; gap: 0.1rem; min-height: 44px; }
+.tab b { color: var(--fg); font-size: 1.05rem; }
+.tab span { font-family: var(--chrome-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.tab[aria-selected="true"] { border-bottom-color: var(--fg); }
+
+.bench { display: grid; gap: 2rem; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 70rem) { .bench { grid-template-columns: minmax(0, 27rem) minmax(0, 1fr); align-items: start; } .stage-col { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 1rem); } }
+.notes { display: grid; gap: 1.75rem; min-width: 0; }
+.notes h3 { font-size: 1.6rem; }
+.thesis { font-size: 1.1rem; }
+.quiet { color: var(--fg-2); }
+.block { display: grid; gap: 0.6rem; }
+.block h4 { margin: 0; font-family: var(--chrome-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-2); font-weight: 500; }
+.map { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.map th, .map td { text-align: left; vertical-align: top; padding: 0.45rem 0.5rem 0.45rem 0; border-top: 1px solid var(--rule); }
+.map th { font-family: var(--chrome-mono); font-weight: 500; font-size: 0.78rem; white-space: nowrap; padding-right: 0.9rem; }
+.list { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.35rem; }
+.refs { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.4rem; }
+.refs a { font-weight: 700; }
+.refs span { color: var(--fg-2); }
+
+.stage-col { display: grid; gap: 0.75rem; min-width: 0; }
+.controls { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: center; }
+.seg { display: inline-flex; border: 1px solid var(--rule); background: var(--surface); }
+.seg button { font: inherit; font-family: var(--chrome-mono); font-size: 0.78rem; background: none; border: 0; color: var(--fg-2); padding: 0.5rem 0.7rem; min-height: 40px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.seg-label { font-family: var(--chrome-mono); font-size: 0.72rem; color: var(--fg-2); text-transform: uppercase; letter-spacing: 0.06em; }
+.frame { border: 1px solid var(--rule); background: repeating-linear-gradient(45deg, transparent 0 8px, var(--rule) 8px 9px); padding: 0.75rem; overflow: hidden; }
+.stage { margin: 0 auto; width: 100%; container-type: inline-size; transition: max-width 0.3s; }
+
+.editor { display: grid; gap: 1.5rem; }
+.tok-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.tok-table th, .tok-table td { text-align: left; padding: 0.4rem 0.5rem 0.4rem 0; border-top: 1px solid var(--rule); vertical-align: middle; }
+.tok-table th { font-family: var(--chrome-mono); font-weight: 500; font-size: 0.75rem; color: var(--fg-2); }
+.tok-name { font-family: var(--chrome-mono); font-size: 0.8rem; white-space: nowrap; }
+.tok-role { color: var(--fg-2); font-size: 0.8rem; }
+.swatch { display: flex; align-items: center; gap: 0.4rem; }
+.swatch input[type="color"] { inline-size: 2.2rem; block-size: 2.2rem; padding: 0; border: 1px solid var(--rule); background: none; cursor: pointer; }
+.swatch input[type="text"] { font-family: var(--chrome-mono); font-size: 0.8rem; inline-size: 5.6rem; padding: 0.35rem; border: 1px solid var(--fg-2); background: var(--surface); color: var(--fg); }
+.ratio { font-family: var(--chrome-mono); font-size: 0.78rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ratio .pass { color: var(--ok); }
+.ratio .fail { color: var(--ko); font-weight: 600; }
+.scroll { overflow-x: auto; }
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: 0.9rem; }
+.fields label { display: grid; gap: 0.3rem; font-size: 0.85rem; }
+.fields select, .fields input[type="range"] { font: inherit; font-size: 0.88rem; padding: 0.4rem; border: 1px solid var(--fg-2); background: var(--surface); color: var(--fg); }
+.fields output { font-family: var(--chrome-mono); font-size: 0.78rem; color: var(--fg-2); }
+.export { display: grid; gap: 0.6rem; }
+.export textarea { font-family: var(--chrome-mono); font-size: 0.75rem; line-height: 1.5; min-height: 16rem; width: 100%; padding: 0.75rem; border: 1px solid var(--rule); background: var(--surface); color: var(--fg); resize: vertical; }
+.btn { font: inherit; font-size: 0.9rem; font-weight: 700; padding: 0.6rem 1rem; min-height: 44px; border: 1px solid var(--fg); background: var(--fg); color: var(--bg); cursor: pointer; }
+.btn.ghost { background: none; color: var(--fg); }
+.row { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+.qs { counter-reset: q; display: grid; gap: 0.9rem; margin: 0; padding: 0; list-style: none; max-width: 52rem; }
+.qs li { background: var(--surface); border: 1px solid var(--rule); padding: 1rem 1.1rem; display: grid; gap: 0.25rem; }
+.qs li b { font-size: 1.02rem; }
+.qs li span { color: var(--fg-2); font-size: 0.92rem; }
+
+/* ── Prototypes : toutes les valeurs viennent des variables posées sur .stage ── */
+.pv { background: var(--c-bg); color: var(--c-text); font-family: var(--f-text); font-size: calc(var(--fs) * 1rem); line-height: 1.55; padding: calc(var(--sp) * 1rem); display: grid; gap: calc(var(--sp) * 1rem); min-height: 34rem; }
+.pv button, .pv input { font: inherit; color: inherit; }
+.pv :focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+.pv-head { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; border-bottom: 1px solid var(--c-line); padding-bottom: calc(var(--sp) * 0.75rem); }
+.pv-brand { font-family: var(--f-display); font-size: calc(var(--fs) * var(--r) * 1rem); letter-spacing: -0.01em; }
+.pv-fav { font-family: var(--f-mono); font-size: 0.8em; display: inline-flex; align-items: center; gap: 0.4em; border: 1px solid var(--c-line); border-radius: var(--rad); padding: 0.3em 0.7em; }
+.pv-fav b { color: var(--c-accent); }
+.pv-filters { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.pv-search { flex: 1 1 12rem; min-width: 0; border: 1px solid var(--c-muted); border-radius: var(--rad); background: var(--c-raised); padding: 0.55em 0.75em; }
+.pv-chip { border: 1px solid var(--c-line); border-radius: var(--rad); padding: 0.45em 0.75em; background: none; cursor: pointer; font-size: 0.85em; }
+.pv-chip[aria-pressed="true"] { background: var(--c-text); color: var(--c-bg); border-color: var(--c-text); }
+.pv-count { font-family: var(--f-mono); font-size: 0.8em; color: var(--c-muted); }
+.pv-title { font-family: var(--f-display); font-size: calc(var(--fs) * var(--r) * var(--r) * 1rem); line-height: 1.1; letter-spacing: -0.015em; text-wrap: balance; }
+.pv-back { background: none; border: 0; padding: 0; cursor: pointer; color: var(--c-accent); font-family: var(--f-mono); font-size: 0.85em; justify-self: start; text-decoration: underline; text-underline-offset: 3px; min-height: 32px; }
+.pv-follow { cursor: pointer; border: 1px solid var(--c-accent); color: var(--c-accent); background: none; border-radius: var(--rad); padding: 0.4em 0.8em; font-size: 0.85em; min-height: 36px; transition: background var(--dur), color var(--dur); }
+.pv-follow[aria-pressed="true"] { background: var(--c-accent); color: var(--c-bg); }
+.pv-facts { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 1rem; margin: 0; font-size: 0.92em; }
+.pv-facts dt { font-family: var(--f-mono); font-size: 0.85em; color: var(--c-muted); }
+.pv-facts dd { margin: 0; font-variant-numeric: tabular-nums; }
+.tone-ACTIVE { --tone: var(--c-success); }
+.tone-SOON { --tone: var(--c-warning); }
+.tone-EXPIRED { --tone: var(--c-danger); }
+.pv-status { color: var(--tone); font-weight: 700; }
+
+/* A — Titre à coupons */
+.a-list { list-style: none; margin: 0; padding: 0; display: grid; gap: calc(var(--sp) * 1rem); grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); }
+.a-card { background: var(--c-raised); border: 1px solid var(--c-line); border-radius: var(--rad); display: grid; }
+.a-body { padding: calc(var(--sp) * 0.9rem); display: grid; gap: 0.4rem; position: relative; overflow: hidden; }
+.a-body::after { content: ""; position: absolute; inset: auto -2.5rem -2.5rem auto; width: 7rem; height: 7rem; border-radius: 50%; background: repeating-radial-gradient(circle, var(--c-decor) 0 1px, transparent 1px 5px); opacity: 0.55; pointer-events: none; }
+.a-serial { font-family: var(--f-mono); font-size: 0.72em; letter-spacing: 0.08em; color: var(--c-danger); text-transform: uppercase; }
+.a-name { font-family: var(--f-display); font-size: calc(var(--fs) * var(--r) * 1rem); line-height: 1.15; font-style: italic; }
+.a-name button { all: unset; cursor: pointer; }
+.a-name button:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+.a-meta { color: var(--c-muted); font-size: 0.85em; }
+.a-coupons { display: flex; border-top: 1px dashed var(--c-muted); }
+.a-coupon { flex: 1; min-width: 0; overflow: hidden; text-overflow: clip; white-space: nowrap; padding: 0.45rem 0.2rem; text-align: center; font-family: var(--f-mono); font-size: 0.72em; border-left: 1px dashed var(--c-muted); background: linear-gradient(to right, color-mix(in srgb, var(--tone) 22%, transparent) var(--fill), transparent var(--fill)); }
+.a-coupon:first-child { border-left: 0; }
+.a-coupon.cut { color: var(--c-muted); text-decoration: line-through; background: repeating-linear-gradient(-45deg, transparent 0 4px, var(--c-line) 4px 5px); }
+.a-foot { display: flex; justify-content: space-between; gap: 0.5rem; align-items: center; flex-wrap: wrap; padding: 0.5rem calc(var(--sp) * 0.9rem); border-top: 1px solid var(--c-line); font-size: 0.85em; }
+.a-detail { display: grid; gap: calc(var(--sp) * 1.25rem); }
+.a-hero { display: grid; gap: calc(var(--sp) * 1rem); grid-template-columns: 1fr; align-items: center; }
+@container (min-width: 600px) { .a-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 15rem); } }
+.a-hero svg { width: 100%; max-width: 15rem; justify-self: center; }
+.a-detail .a-coupons { border: 1px dashed var(--c-muted); border-radius: var(--rad); }
+.a-detail .a-coupon { font-size: 0.85em; padding: 0.9rem 0.4rem; }
+
+/* B — Salle des coffres */
+.b-wall { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); background: var(--c-line); border: 3px solid var(--c-line); border-radius: var(--rad); }
+.b-box { background: var(--c-raised); display: grid; }
+.b-box > button { all: unset; cursor: pointer; display: grid; gap: 0.55rem; padding: calc(var(--sp) * 0.9rem); transition: transform var(--dur), box-shadow var(--dur); }
+.b-box > button:hover, .b-box > button:focus-visible { transform: translateY(-3px); box-shadow: 0 6px 0 var(--c-decor); }
+.b-box > button:focus-visible { outline: 2px solid var(--c-accent); outline-offset: -4px; }
+.b-plate { justify-self: start; font-family: var(--f-display); font-stretch: 125%; font-weight: 700; font-size: 0.8em; letter-spacing: 0.12em; color: var(--c-accent); border: 1px solid var(--c-accent); border-radius: var(--rad); padding: 0.1em 0.55em; }
+.b-name { font-family: var(--f-display); font-weight: 600; font-size: calc(var(--fs) * 1.08rem); line-height: 1.2; }
+.b-meta { color: var(--c-muted); font-size: 0.82em; }
+.b-handle { height: 4px; width: 38%; background: var(--c-decor); border-radius: 2px; }
+.b-light { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85em; }
+.b-light i { inline-size: 0.9em; block-size: 0.9em; border-radius: 50%; border: 2px solid var(--tone); flex: none; }
+.tone-ACTIVE .b-light i { background: var(--tone); box-shadow: 0 0 0.6em color-mix(in srgb, var(--tone) 60%, transparent); }
+.tone-SOON .b-light i { background: linear-gradient(to right, var(--tone) 50%, transparent 50%); }
+.b-days { font-family: var(--f-mono); font-size: calc(var(--fs) * var(--r) * 1rem); font-variant-numeric: tabular-nums; line-height: 1; }
+.b-days small { font-size: 0.55em; color: var(--c-muted); }
+.b-row { display: flex; justify-content: space-between; align-items: end; gap: 0.5rem; }
+.b-keep { border-top: 1px solid var(--c-line); padding: 0.4rem calc(var(--sp) * 0.9rem); display: flex; justify-content: flex-end; }
+.b-detail { display: grid; gap: calc(var(--sp) * 1.25rem); }
+.b-open { display: grid; gap: calc(var(--sp) * 1rem); grid-template-columns: 1fr; background: var(--c-raised); border: 3px solid var(--c-line); border-radius: var(--rad); padding: calc(var(--sp) * 1rem); }
+@container (min-width: 600px) { .b-open { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); align-items: center; } }
+.b-open svg { width: 100%; max-width: 15rem; justify-self: center; }
+.b-ticket { font-family: var(--f-mono); font-size: 0.85em; background: var(--c-bg); border: 1px dashed var(--c-muted); padding: 0.9rem; display: grid; gap: 0.2rem; }
+
+/* C — Ligne de couverture */
+.c-axis, .c-row { display: grid; gap: 0.25rem 0.9rem; grid-template-columns: 1fr; }
+@container (min-width: 560px) { .c-axis, .c-row { grid-template-columns: 11rem minmax(0, 1fr); } }
+.c-axis .c-track { height: 1.4rem; border-bottom: 1px solid var(--c-muted); }
+.c-axis > span:first-child { display: none; }
+@container (min-width: 560px) { .c-axis > span:first-child { display: block; } }
+.c-year { position: absolute; bottom: 0.15rem; transform: translateX(-50%); font-family: var(--f-mono); font-size: 0.68em; color: var(--c-muted); }
+.c-tick { position: absolute; bottom: 0; height: 0.35rem; border-left: 1px solid var(--c-muted); }
+.c-list { list-style: none; margin: 0; padding: 0; display: grid; }
+.c-row { padding: 0.6rem 0; border-bottom: 1px solid var(--c-line); align-items: center; }
+.c-label { display: grid; min-width: 0; }
+.c-label button { all: unset; cursor: pointer; font-family: var(--f-display); font-weight: 650; line-height: 1.2; }
+.c-label button:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+.c-label small { color: var(--c-muted); font-size: 0.8em; }
+.c-track { position: relative; height: 1.9rem; background-image: linear-gradient(to right, var(--c-decor) 1px, transparent 1px); background-size: calc(100% / var(--years)) 100%; }
+.c-bar { position: absolute; top: 0.45rem; height: 1rem; background: var(--tone); border-radius: var(--rad); }
+.tone-EXPIRED .c-bar { background: repeating-linear-gradient(-45deg, var(--tone) 0 2px, transparent 2px 6px); border: 1px solid var(--tone); }
+.c-now { position: absolute; top: -0.3rem; bottom: -0.3rem; border-left: 2px solid var(--c-accent); }
+.c-now::before { content: ""; position: absolute; top: -0.2rem; left: -0.3rem; width: 0.5rem; height: 0.5rem; background: var(--c-accent); transform: rotate(45deg); }
+.c-state { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.4rem; align-items: center; font-size: 0.82em; }
+@container (min-width: 560px) { .c-state { grid-column: 2; } }
+.c-legend { display: flex; flex-wrap: wrap; gap: 0.75rem; font-family: var(--f-mono); font-size: 0.75em; color: var(--c-muted); align-items: center; }
+.c-legend i { display: inline-block; width: 1.1rem; height: 0.6rem; margin-right: 0.3rem; vertical-align: middle; border-radius: 2px; }
+.c-detail { display: grid; gap: calc(var(--sp) * 1.25rem); }
+.c-big { position: relative; height: 4.5rem; border: 1px solid var(--c-line); border-radius: var(--rad); background-image: linear-gradient(to right, var(--c-decor) 1px, transparent 1px); background-size: calc(100% / var(--months)) 100%; }
+.c-big .c-bar { top: 1.4rem; height: 1.7rem; }
+.c-big .c-now { top: -0.6rem; bottom: -0.6rem; }
+.c-big-labels { display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: 0.75em; color: var(--c-muted); gap: 0.5rem; }
+.c-now-label { font-family: var(--f-mono); font-size: 0.75em; color: var(--c-accent); }
+@media (prefers-reduced-motion: reduce) { .pv *, .stage { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <p class="eyebrow">Garantix · direction artistique · 27 novembre 2026</p>
+    <h1>Quel objet rend une garantie lisible sans la lire ?</h1>
+    <p>Trois directions pour la refonte du front de Garantix, chacune tirée d'un objet réel qui sait déjà dire « ce qui reste ». Chaque prototype fonctionne : ouvre un achat, suis-le, change de largeur et de thème. Ensuite, règle chaque token jusqu'à la valeur, avec les contrastes recalculés en direct, et exporte ton <code>tokens.css</code>.</p>
+  </header>
+
+  <section class="section" aria-labelledby="diag-h">
+    <h2 id="diag-h">Le point de départ : Garantix aujourd'hui</h2>
+    <div class="diag">
+      <article>
+        <h3>À garder</h3>
+        <ul>
+          <li><strong>La rosette guilloché</strong> qui s'efface avec le temps : une signature que personne d'autre n'a.</li>
+          <li><strong>Le registre du papier de valeur</strong> : une garantie est un document qui vaut quelque chose.</li>
+          <li><strong>Le ton</strong> : « une promesse avec une date de péremption ».</li>
+        </ul>
+      </article>
+      <article>
+        <h3>À corriger</h3>
+        <ul>
+          <li><strong>Texte courant en mono à 13 px</strong> : fatigant à lire, sous la taille de base du navigateur.</li>
+          <li><strong>Gris <code>#9b9b96</code> à 2.79:1</strong> utilisé pour du texte : non conforme RGAA 3.2.</li>
+          <li><strong>Statut porté surtout par la couleur</strong> du trait de la rosette.</li>
+        </ul>
+      </article>
+      <article>
+        <h3>Ce qui manque</h3>
+        <ul>
+          <li><strong>La métaphore n'organise pas l'interface</strong> : le coffre reste une liste de cartes comme ailleurs.</li>
+          <li><strong>Papier blanc, encre noire, une touche de vermillon</strong> : une combinaison devenue très courante, donc peu distinctive.</li>
+          <li><strong>Aucune lecture d'ensemble</strong> : on ne voit pas d'un coup d'œil ce qui est encore couvert.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="dir-h">
+    <h2 id="dir-h">Trois directions</h2>
+    <div class="tabs" role="tablist" aria-label="Directions" id="tabs"></div>
+    <div class="bench" id="panel" role="tabpanel" tabindex="-1">
+      <div class="notes" id="notes"></div>
+      <div class="stage-col">
+        <div class="controls">
+          <span class="seg-label" id="lv">Vue</span>
+          <div class="seg" role="group" aria-labelledby="lv" id="ctl-view"></div>
+          <span class="seg-label" id="lw">Largeur</span>
+          <div class="seg" role="group" aria-labelledby="lw" id="ctl-width"></div>
+          <span class="seg-label" id="lm">Thème</span>
+          <div class="seg" role="group" aria-labelledby="lm" id="ctl-mode"></div>
+        </div>
+        <div class="frame"><div class="stage" id="stage"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section editor" aria-labelledby="tok-h">
+    <div class="block">
+      <h2 id="tok-h">Au token près</h2>
+      <p class="quiet" id="tok-lead"></p>
+    </div>
+    <div class="scroll">
+      <table class="tok-table">
+        <thead><tr><th scope="col">Token</th><th scope="col">Rôle</th><th scope="col">Valeur</th><th scope="col">sur bg</th><th scope="col">sur raised</th></tr></thead>
+        <tbody id="tok-colors"></tbody>
+      </table>
+    </div>
+    <div class="fields" id="tok-fields"></div>
+    <div class="export">
+      <h3>Export <code>src/styles/tokens.css</code></h3>
+      <textarea id="export" readonly aria-label="Contenu de tokens.css"></textarea>
+      <div class="row">
+        <button class="btn" type="button" id="copy">Copier tokens.css</button>
+        <button class="btn ghost" type="button" id="reset">Revenir aux valeurs d'origine</button>
+        <span id="copy-msg" class="quiet" role="status"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="q-h">
+    <h2 id="q-h">Cinq questions avant de choisir</h2>
+    <p class="quiet">Le choix t'appartient. Réponds pour toi, puis dis-moi ta direction, ou ton croisement (par exemple la ligne de couverture pour la liste et la rosette comme sceau du détail).</p>
+    <ol class="qs">
+      <li><b>Quel objet vois-tu quand tu penses à quelque chose de précieux que tu gardes ?</b><span>Un titre qu'on détache, une clé de casier, une aiguille qui avance.</span></li>
+      <li><b>Que doit ressentir la personne en ouvrant son coffre ?</b><span>La sérénité (tout est couvert), la maîtrise (je sais tout), ou l'alerte (agir avant la date).</span></li>
+      <li><b>Dans quel prototype as-tu compris le statut le plus vite, sans lire le texte ?</b><span>Teste à 320 px : c'est là que la métaphore tient ou casse.</span></li>
+      <li><b>Quel détail de Garantix veux-tu absolument garder ?</b><span>La rosette, la mono pour les chiffres, le vocabulaire « coffre ».</span></li>
+      <li><b>Qu'est-ce que tu refuses de voir dans ton app ?</b><span>Un refus clair vaut souvent mieux qu'une envie floue.</span></li>
+    </ol>
+  </section>
+</div>
+
+<script>
+const TODAY = new Date(Date.UTC(2026, 10, 27));
+const DAY = 86400000;
+const ACHATS = [
+  { slug: "casque-sony", produit: "Casque WH-1000XM5", marque: "Sony", categorie: "Audio", vendeur: "Boulanger", prix: 379, date: "2024-12-15", ans: 2, n: "0137" },
+  { slug: "pixel-9", produit: "Pixel 9", marque: "Google", categorie: "Téléphonie", vendeur: "Fnac", prix: 899, date: "2024-12-01", ans: 2, n: "0139" },
+  { slug: "macbook-air", produit: "MacBook Air 13 pouces", marque: "Apple", categorie: "Informatique", vendeur: "Apple Store", prix: 1299, date: "2025-09-02", ans: 2, n: "0142" },
+  { slug: "frigo-liebherr", produit: "Réfrigérateur combiné", marque: "Liebherr", categorie: "Électroménager", vendeur: "Darty", prix: 1049, date: "2022-06-01", ans: 5, n: "0118" },
+  { slug: "velo-cargo", produit: "Vélo cargo GSD", marque: "Tern", categorie: "Mobilité", vendeur: "Cyclable", prix: 5290, date: "2023-05-20", ans: 5, n: "0124" },
+  { slug: "lave-linge", produit: "Lave-linge Série 6", marque: "Bosch", categorie: "Électroménager", vendeur: "Darty", prix: 649, date: "2024-03-12", ans: 2, n: "0131" }
+];
+const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(Date.UTC(y, m - 1, d)); };
+const addYears = (d, n) => new Date(Date.UTC(d.getUTCFullYear() + n, d.getUTCMonth(), d.getUTCDate()));
+const fmt = d => d.toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+const euro = n => n.toLocaleString("fr-FR", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+function etat(a) {
+  const debut = parse(a.date), fin = addYears(debut, a.ans);
+  const jours = Math.round((fin - TODAY) / DAY);
+  const total = Math.round((fin - debut) / DAY);
+  const statut = jours < 0 ? "EXPIRED" : jours <= 30 ? "SOON" : "ACTIVE";
+  return { debut, fin, jours, statut, ratio: Math.min(Math.max(jours / total, 0), 1) };
+}
+const LIB = { ACTIVE: "Couvert", SOON: "Expire bientôt", EXPIRED: "Expiré" };
+const joursTxt = e => e.jours < 0 ? `depuis ${-e.jours} j` : e.jours <= 30 ? `plus que ${e.jours} j` : `encore ${e.jours} j`;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+const FONTS = {
+  display: { "Bodoni Moda": '"Bodoni Moda", Didot, "Times New Roman", serif', "Archivo": 'Archivo, "Arial Narrow", sans-serif', "Bricolage Grotesque": '"Bricolage Grotesque", system-ui, sans-serif', "IBM Plex Sans Condensed": '"IBM Plex Sans Condensed", "Arial Narrow", sans-serif', "Atkinson Hyperlegible": '"Atkinson Hyperlegible", system-ui, sans-serif', "Serif système": 'ui-serif, Georgia, serif' },
+  text: { "Atkinson Hyperlegible": '"Atkinson Hyperlegible", system-ui, sans-serif', "IBM Plex Sans Condensed": '"IBM Plex Sans Condensed", "Arial Narrow", sans-serif', "Archivo": 'Archivo, Arial, sans-serif', "Sans système": 'system-ui, -apple-system, "Segoe UI", sans-serif' },
+  mono: { "IBM Plex Mono": '"IBM Plex Mono", ui-monospace, monospace', "JetBrains Mono": '"JetBrains Mono", ui-monospace, monospace', "Chivo Mono": '"Chivo Mono", ui-monospace, monospace', "Mono système": 'ui-monospace, "SF Mono", Menlo, monospace' }
+};
+const ROLES = {
+  bg: "Fond de page", raised: "Cartes, casiers, panneaux", text: "Texte principal", muted: "Texte secondaire, bordures de champ",
+  decor: "Filets et motifs, jamais du texte", accent: "Liens, actions, focus, suivis", danger: "Statut expiré", warning: "Statut expire bientôt", success: "Statut couvert"
+};
+
+const DIRS = {
+  A: {
+    nom: "Le Titre à coupons", court: "Héritage guilloché", mode: "light",
+    these: "Une garantie de trois ans est un titre à trois coupons. Chaque année écoulée, un coupon est détaché. On lit « il m'en reste deux » avant de lire un seul mot.",
+    pourquoi: "Les obligations au porteur portaient des coupons qu'on découpait à chaque échéance d'intérêt, jusqu'à ne garder que le corps du titre. C'est exactement la forme d'une garantie qui se consomme année après année. La direction prolonge l'identité actuelle (rosette, papier de valeur) et la fait enfin servir à lire l'information.",
+    map: [["EX-01", "La liasse : une carte-titre par achat, avec numéro de série et bande de coupons."], ["EX-02", "Classer par série (catégorie), par statut, recherche texte. Compteur « 6 titres » annoncé."], ["EX-03", "Le titre en grand, la rosette comme sceau, le talon : vendeur, prix, échéance."], ["EX-04", "« Suivre » appose ton sceau ; l'en-tête compte les sceaux."], ["EX-05", "« Émettre un titre » : un bulletin de souscription à remplir."]],
+    risques: ["Les coupons portent l'information par la forme : chaque carte dit aussi en texte « 1 coupon restant sur 2 ».", "Le guilloché est un SVG calculé une fois, sans animation continue : coût CPU nul au repos.", "Le numéro de série en rouge reprend un vrai code des billets ; il passe 5.7:1 sur le papier."],
+    eco: "Deux fichiers de police (Bodoni Moda et Plex Mono, sous-ensembles latins) ou zéro avec les polices système.",
+    refs: [["https://en.wikipedia.org/wiki/Bearer_bond", "Bearer bond", "coupons détachés, corps du titre"], ["https://euipo.europa.eu/anti-counterfeiting-and-anti-piracy-technology-guide/marking-technologies/guillocherainbow-printing", "EUIPO, guilloché et irisé", "la technique d'impression de sécurité"], ["https://dribbble.com/benhodosi", "Ben Hodosi", "rosettes et billets contemporains"], ["https://www.ideabook.com/guilloche-and-document-security/", "Ideabook", "guilloché et sécurité documentaire"]],
+    fonts: { display: "Bodoni Moda", text: "IBM Plex Sans Condensed", mono: "IBM Plex Mono" },
+    fs: 1, r: 1.333, sp: 1, rad: 2, dur: 240,
+    colors: {
+      light: { bg: "#eef1ec", raised: "#f7f8f5", text: "#14231f", muted: "#4a5a55", decor: "#a9b5ae", accent: "#4b2e83", danger: "#b3261e", warning: "#8a5a00", success: "#1f6a4a" },
+      dark: { bg: "#0f1715", raised: "#16211e", text: "#e6ece7", muted: "#a3b2ab", decor: "#4a5a55", accent: "#b9a2e6", danger: "#ff8a7a", warning: "#e2b65c", success: "#7fd1a8" }
+    }
+  },
+  B: {
+    nom: "La Salle des coffres", court: "Métaphore spatiale", mode: "dark",
+    these: "Le coffre devient un vrai mur de casiers numérotés. Chaque achat a sa porte, sa plaque gravée et son voyant. Ouvrir un casier, c'est ouvrir le détail.",
+    pourquoi: "L'app s'appelle déjà un coffre. Ici la grille CSS n'est plus une mise en page neutre : c'est le mur. Le voyant (plein, à moitié, éteint) se lit comme un témoin lumineux, et le cadran du coffre gradué en mois remplace la jauge abstraite.",
+    map: [["EX-01", "Le mur : un casier par achat, plaque, voyant, jours restants en gros chiffres."], ["EX-02", "Les filtres sont des « allées » : catégorie, statut, recherche."], ["EX-03", "Le casier ouvert : cadran gradué en mois, ticket d'achat, plaque."], ["EX-04", "« Garder la clé » ; l'en-tête montre le trousseau."], ["EX-05", "« Louer un casier » : le formulaire d'ajout."]],
+    risques: ["Sombre par défaut : le mode clair doit être aussi soigné, pas une inversion.", "Pas d'effet métal ni d'ombres floues : aplats et filets, meilleurs pour le contraste et pour l'EcoIndex.", "Le mouvement d'ouverture du casier disparaît avec prefers-reduced-motion."],
+    eco: "Archivo est variable en largeur et en graisse : un seul fichier sert les plaques étendues et le texte.",
+    refs: [["https://behance.net/gallery/100614037/Saeker-Switzerland-Sparbank", "Säker Sparbank", "identité de banque bâtie sur le coffre et le cadran"], ["https://monocle.com/design/architecture/pictet-zurich-office-design-renovation-tilla-theus/", "Monocle, Pictet Zurich", "murs de coffres en laiton"], ["https://www.anagrama.com/project/helvetia-trust", "Anagrama, Helvetia Trust", "sécurité suisse en identité"]],
+    fonts: { display: "Archivo", text: "Archivo", mono: "JetBrains Mono" },
+    fs: 1, r: 1.25, sp: 1, rad: 3, dur: 200,
+    colors: {
+      light: { bg: "#e7e5e0", raised: "#f3f2ef", text: "#18191b", muted: "#55544f", decor: "#b8b5ad", accent: "#7a5a1c", danger: "#a8301f", warning: "#7d5a00", success: "#2c6b3a" },
+      dark: { bg: "#16181a", raised: "#202326", text: "#ece8df", muted: "#a8a39a", decor: "#3a3e42", accent: "#c9a45c", danger: "#ff7a66", warning: "#e8b84a", success: "#8fd49b" }
+    }
+  },
+  C: {
+    nom: "La Ligne de couverture", court: "Le temps rendu visible", mode: "light",
+    these: "Une garantie est une durée : on la dessine comme telle. Une barre du jour d'achat à l'échéance, et une aiguille « aujourd'hui » qui traverse tout le coffre. Ce que l'aiguille touche est couvert.",
+    pourquoi: "C'est la seule direction qui répond d'un seul regard à la question de l'app : qu'est-ce qui est encore couvert ? La palette vient du cyanotype, un tirage dont l'image dépend d'un temps d'exposition. Le texte courant est en Atkinson Hyperlegible, dessinée par le Braille Institute pour la lisibilité.",
+    map: [["EX-01", "La frise : une ligne par achat, une aiguille commune, l'état écrit sous la barre."], ["EX-02", "Les filtres retirent des lignes ; l'aiguille reste le repère."], ["EX-03", "La frise de l'achat, mois par mois, avec l'aiguille et la fiche."], ["EX-04", "« Épingler » remonte la ligne en tête ; compteur d'épingles."], ["EX-05", "« Tracer une garantie » : le formulaire d'ajout."]],
+    risques: ["Une frise est un graphique : chaque ligne reste un élément de liste avec l'échéance et les jours en texte, jamais un canvas.", "À 320 px, la barre passe sous le libellé ; l'axe des années se lit sur la piste.", "Expiré se distingue aussi par des hachures, pas seulement par la couleur."],
+    eco: "Aucune image : la frise est du CSS pur (dégradés et positions en pourcentage).",
+    refs: [["https://en.wikipedia.org/wiki/Cyanotype", "Cyanotype", "l'image comme temps d'exposition"], ["https://www.brailleinstitute.org/freefont/", "Atkinson Hyperlegible", "police conçue pour les basses visions"], ["https://www.ecb.europa.eu/euro/banknotes/security/html/index.en.html", "BCE, signes de sécurité", "lire un document sans le décoder"]],
+    fonts: { display: "Bricolage Grotesque", text: "Atkinson Hyperlegible", mono: "Chivo Mono" },
+    fs: 1, r: 1.25, sp: 1, rad: 2, dur: 220,
+    colors: {
+      light: { bg: "#f4f7fb", raised: "#ffffff", text: "#0e1f3a", muted: "#4a5b78", decor: "#b9c8de", accent: "#1f4fa3", danger: "#b4232f", warning: "#8a5d00", success: "#1d6b52" },
+      dark: { bg: "#0d2747", raised: "#133258", text: "#eef4ff", muted: "#a9bedf", decor: "#2e5583", accent: "#9fd0ff", danger: "#ff9b9b", warning: "#ffd27a", success: "#8fe3c0" }
+    }
+  }
+};
+const ORIGIN = JSON.parse(JSON.stringify(DIRS));
+const KEY = "garantix-atelier-v1";
+try { const saved = JSON.parse(localStorage.getItem(KEY) || "null"); if (saved) for (const k of Object.keys(DIRS)) if (saved[k]) Object.assign(DIRS[k], saved[k]); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(DIRS)); } catch (e) {} };
+
+const st = { dir: "A", view: "list", width: "full", slug: "casque-sony", suivis: new Set(["macbook-air"]), filtre: "Tous" };
+
+function lum(hex) {
+  const c = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(v => v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+}
+const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+const valid = h => /^#[0-9a-f]{6}$/i.test(h);
+
+function rosette(years, ratioLeft, tone) {
+  const rings = 12, petals = 5 + 2 * Math.min(years, 6), lit = Math.round(rings * ratioLeft);
+  let paths = "";
+  for (let i = 0; i < rings; i++) {
+    const radius = 100 - i * 5.6, phase = (i * Math.PI) / (petals * 1.5), amp = 0.07 + i * 0.004;
+    let d = "";
+    for (let s = 0; s <= 160; s++) {
+      const th = (s / 160) * Math.PI * 2, r = radius * (1 - amp + amp * Math.cos(petals * th + phase));
+      d += `${s ? "L" : "M"}${(Math.cos(th) * r).toFixed(1)} ${(Math.sin(th) * r).toFixed(1)}`;
+    }
+    paths += `<path d="${d}Z" fill="none" stroke="${i < lit ? tone : "var(--c-decor)"}" stroke-width="${i < lit ? 0.9 : 0.6}"/>`;
+  }
+  const c = 2 * Math.PI * 110;
+  return `<svg viewBox="-120 -120 240 240" aria-hidden="true">${paths}<circle r="110" fill="none" stroke="var(--c-line)"/><circle r="110" fill="none" stroke="${tone}" stroke-width="2" stroke-dasharray="${(c * ratioLeft).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90)"/></svg>`;
+}
+function cadran(a, e) {
+  const months = a.ans * 12, left = Math.max(0, Math.round(e.ratio * months));
+  let ticks = "";
+  for (let i = 0; i < months; i++) {
+    const ang = (i / months) * Math.PI * 2 - Math.PI / 2, big = i % 12 === 0, r1 = big ? 78 : 86, on = i >= months - left;
+    ticks += `<line x1="${(Math.cos(ang) * r1).toFixed(1)}" y1="${(Math.sin(ang) * r1).toFixed(1)}" x2="${(Math.cos(ang) * 98).toFixed(1)}" y2="${(Math.sin(ang) * 98).toFixed(1)}" stroke="${on ? "var(--tone)" : "var(--c-decor)"}" stroke-width="${big ? 3 : 2}"/>`;
+  }
+  const na = (1 - e.ratio) * Math.PI * 2 - Math.PI / 2;
+  return `<svg viewBox="-110 -110 220 220" aria-hidden="true"><circle r="104" fill="var(--c-bg)" stroke="var(--c-line)" stroke-width="2"/>${ticks}<line x1="0" y1="0" x2="${(Math.cos(na) * 70).toFixed(1)}" y2="${(Math.sin(na) * 70).toFixed(1)}" stroke="var(--c-accent)" stroke-width="4" stroke-linecap="round"/><circle r="9" fill="var(--c-accent)"/><text y="44" text-anchor="middle" fill="var(--c-text)" font-family="var(--f-mono)" font-size="22">${Math.max(e.jours, 0)} j</text></svg>`;
+}
+
+const visibles = () => ACHATS.map(a => ({ a, e: etat(a) })).filter(x => st.filtre === "Tous" || LIB[x.e.statut] === st.filtre);
+const followBtn = (a, label) => `<button type="button" class="pv-follow" data-follow="${a.slug}" aria-pressed="${st.suivis.has(a.slug)}">${st.suivis.has(a.slug) ? label[1] : label[0]}</button>`;
+function head(word) {
+  return `<div class="pv-head"><span class="pv-brand">Garantix</span><span class="pv-fav" aria-label="${st.suivis.size} ${word}">${word} <b>${st.suivis.size}</b></span></div>`;
+}
+function filters(unit) {
+  const n = visibles().length;
+  return `<div class="pv-filters"><input class="pv-search" type="search" placeholder="Produit, marque, vendeur" aria-label="Rechercher">${["Tous", "Couvert", "Expire bientôt", "Expiré"].map(f => `<button type="button" class="pv-chip" data-filtre="${f}" aria-pressed="${st.filtre === f}">${f}</button>`).join("")}</div><p class="pv-count" aria-live="polite">${n} ${unit}${n > 1 ? "s" : ""}</p>`;
+}
+function facts(a, e) {
+  return `<dl class="pv-facts"><dt>Marque</dt><dd>${esc(a.marque)}</dd><dt>Vendeur</dt><dd>${esc(a.vendeur)}</dd><dt>Prix</dt><dd>${euro(a.prix)}</dd><dt>Achat</dt><dd>${fmt(e.debut)}</dd><dt>Échéance</dt><dd>${fmt(e.fin)}</dd><dt>Statut</dt><dd class="pv-status">${LIB[e.statut]}, ${joursTxt(e)}</dd></dl>`;
+}
+function coupons(a, e, long) {
+  const y0 = e.debut.getUTCFullYear();
+  const label = y => long ? `${y}–${String(y + 1).slice(2)}` : `’${String(y).slice(2)}`;
+  let out = "";
+  for (let i = 0; i < a.ans; i++) {
+    const s = addYears(e.debut, i), f = addYears(e.debut, i + 1);
+    const frac = TODAY >= f ? 0 : TODAY <= s ? 1 : (f - TODAY) / (f - s);
+    out += `<span class="a-coupon${frac === 0 ? " cut" : ""}" style="--fill:${(frac * 100).toFixed(0)}%">${label(y0 + i)}</span>`;
+  }
+  return out;
+}
+
+const RENDER = {
+  A: {
+    list() {
+      return `${head("Sceaux")}${filters("titre")}<ol class="a-list">${visibles().map(({ a, e }) => {
+        const left = Math.ceil(e.ratio * a.ans - 1e-9);
+        return `<li class="a-card tone-${e.statut}"><div class="a-body"><span class="a-serial">N° GX-${a.n} · ${esc(a.categorie)}</span><h3 class="a-name"><button type="button" data-open="${a.slug}">${esc(a.produit)}</button></h3><span class="a-meta">${esc(a.marque)} · ${esc(a.vendeur)}</span></div><div class="a-coupons" role="img" aria-label="${left} coupon${left > 1 ? "s" : ""} restant${left > 1 ? "s" : ""} sur ${a.ans}">${coupons(a, e)}</div><div class="a-foot"><span class="pv-status">${LIB[e.statut]} · ${joursTxt(e)}</span>${followBtn(a, ["Suivre", "Scellé"])}</div></li>`;
+      }).join("")}</ol>`;
+    },
+    detail(a, e) {
+      return `${head("Sceaux")}<div class="a-detail tone-${e.statut}"><button type="button" class="pv-back" data-back>Retour à la liasse</button><div class="a-hero"><div style="display:grid;gap:.6rem"><span class="a-serial">N° GX-${a.n} · ${esc(a.categorie)}</span><h2 class="pv-title" style="font-style:italic">${esc(a.produit)}</h2><p class="pv-status">${LIB[e.statut]}, ${joursTxt(e)}</p>${followBtn(a, ["Suivre", "Scellé"])}</div>${rosette(a.ans, e.ratio, "var(--tone)")}</div><div class="a-coupons">${coupons(a, e, true)}</div>${facts(a, e)}</div>`;
+    }
+  },
+  B: {
+    list() {
+      return `${head("Trousseau")}${filters("casier")}<ol class="b-wall">${visibles().map(({ a, e }) => `<li class="b-box tone-${e.statut}"><button type="button" data-open="${a.slug}" aria-label="Casier ${a.n}, ${esc(a.produit)}, ${LIB[e.statut]}, ${joursTxt(e)}"><span class="b-plate">${a.n}</span><span class="b-name">${esc(a.produit)}</span><span class="b-meta">${esc(a.marque)} · ${esc(a.categorie)}</span><span class="b-row"><span class="b-light"><i></i>${LIB[e.statut]}</span><span class="b-days">${Math.abs(e.jours)}<small> j</small></span></span><span class="b-handle"></span></button><div class="b-keep">${followBtn(a, ["Garder la clé", "Clé gardée"])}</div></li>`).join("")}</ol>`;
+    },
+    detail(a, e) {
+      return `${head("Trousseau")}<div class="b-detail tone-${e.statut}"><button type="button" class="pv-back" data-back>Refermer le casier</button><div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap"><span class="b-plate">${a.n}</span><h2 class="pv-title">${esc(a.produit)}</h2></div><div class="b-open">${cadran(a, e)}<div style="display:grid;gap:.9rem"><p class="b-light"><i></i><span class="pv-status">${LIB[e.statut]}, ${joursTxt(e)}</span></p><div class="b-ticket"><span>${esc(a.vendeur).toUpperCase()}</span><span>${fmt(e.debut)}</span><span>${esc(a.marque)} ${esc(a.produit)}</span><span>TOTAL ${euro(a.prix)}</span><span>GARANTIE ${a.ans} ANS</span></div>${followBtn(a, ["Garder la clé", "Clé gardée"])}</div></div>${facts(a, e)}</div>`;
+    }
+  },
+  C: {
+    list() {
+      const y0 = 2022, y1 = 2030, span = Date.UTC(y1, 0, 1) - Date.UTC(y0, 0, 1);
+      const pos = d => ((d - Date.UTC(y0, 0, 1)) / span * 100).toFixed(2);
+      let years = "";
+      for (let y = y0; y <= y1; y++) years += `<span class="c-tick" style="left:${pos(Date.UTC(y, 0, 1))}%"></span>${y < y1 ? `<span class="c-year" style="left:${pos(Date.UTC(y, 6, 1))}%">${y}</span>` : ""}`;
+      const items = visibles().slice().sort((p, q) => st.suivis.has(q.a.slug) - st.suivis.has(p.a.slug) || p.e.fin - q.e.fin);
+      return `${head("Épingles")}${filters("ligne")}<div class="c-legend"><span><i style="background:var(--c-success)"></i>Couvert</span><span><i style="background:var(--c-warning)"></i>Expire bientôt</span><span><i style="background:repeating-linear-gradient(-45deg,var(--c-danger) 0 2px,transparent 2px 5px);border:1px solid var(--c-danger)"></i>Expiré</span><span style="color:var(--c-accent)">│ aujourd'hui, ${fmt(TODAY)}</span></div><div class="c-axis" aria-hidden="true"><span></span><div class="c-track" style="--years:${y1 - y0}">${years}</div></div><ol class="c-list">${items.map(({ a, e }) => `<li class="c-row tone-${e.statut}"><div class="c-label"><button type="button" data-open="${a.slug}">${esc(a.produit)}</button><small>${esc(a.marque)} · ${esc(a.categorie)}</small></div><div class="c-track" style="--years:${y1 - y0}" aria-hidden="true"><span class="c-bar" style="left:${pos(e.debut)}%;width:${(pos(e.fin) - pos(e.debut)).toFixed(2)}%"></span><span class="c-now" style="left:${pos(TODAY)}%"></span></div><div class="c-state"><span class="pv-status">${LIB[e.statut]} ${e.jours < 0 ? "le" : "jusqu'au"} ${fmt(e.fin)}, ${joursTxt(e)}</span>${followBtn(a, ["Épingler", "Épinglé"])}</div></li>`).join("")}</ol>`;
+    },
+    detail(a, e) {
+      const s = e.debut.getTime(), f = e.fin.getTime(), now = Math.min(Math.max(TODAY.getTime(), s), f);
+      const pct = ((now - s) / (f - s) * 100).toFixed(2);
+      return `${head("Épingles")}<div class="c-detail tone-${e.statut}"><button type="button" class="pv-back" data-back>Retour à la frise</button><h2 class="pv-title">${esc(a.produit)}</h2><p class="pv-status">${LIB[e.statut]}, ${joursTxt(e)}</p><div><div class="c-big" style="--months:${a.ans * 12}" aria-hidden="true"><span class="c-bar" style="left:0;width:100%;opacity:.28"></span><span class="c-bar" style="left:${pct}%;width:${(100 - pct).toFixed(2)}%"></span><span class="c-now" style="left:${pct}%"></span></div><div class="c-big-labels"><span>${fmt(e.debut)}</span><span class="c-now-label">aujourd'hui</span><span>${fmt(e.fin)}</span></div></div>${followBtn(a, ["Épingler", "Épinglé"])}${facts(a, e)}</div>`;
+    }
+  }
+};
+
+const $ = id => document.getElementById(id);
+const dir = () => DIRS[st.dir];
+const mode = () => dir().mode;
+
+function renderTabs() {
+  $("tabs").innerHTML = Object.entries(DIRS).map(([k, d]) => `<button type="button" role="tab" class="tab" id="tab-${k}" aria-controls="panel" aria-selected="${st.dir === k}" tabindex="${st.dir === k ? 0 : -1}"><span>Direction ${k} · ${d.court}</span><b>${d.nom}</b></button>`).join("");
+  $("panel").setAttribute("aria-labelledby", `tab-${st.dir}`);
+}
+function renderNotes() {
+  const d = dir();
+  $("notes").innerHTML = `<div class="block"><p class="eyebrow">Direction ${st.dir}</p><h3>${d.nom}</h3><p class="thesis">${d.these}</p><p class="quiet">${d.pourquoi}</p></div>
+  <div class="block"><h4>Les exigences dans cette direction</h4><table class="map"><tbody>${d.map.map(([k, v]) => `<tr><th scope="row">${k}</th><td>${v}</td></tr>`).join("")}</tbody></table></div>
+  <div class="block"><h4>Accessibilité et risques</h4><ul class="list">${d.risques.map(r => `<li>${r}</li>`).join("")}</ul></div>
+  <div class="block"><h4>Éco-conception</h4><p>${d.eco}</p></div>
+  <div class="block"><h4>Inspirations</h4><ul class="refs">${d.refs.map(([u, t, s]) => `<li><a href="${u}" target="_blank" rel="noopener">${t}</a> <span>· ${s}</span></li>`).join("")}</ul></div>`;
+}
+function seg(id, items, current, attr) {
+  $(id).innerHTML = items.map(([v, l]) => `<button type="button" data-${attr}="${v}" aria-pressed="${current === v}">${l}</button>`).join("");
+}
+function renderControls() {
+  seg("ctl-view", [["list", "Coffre"], ["detail", "Détail"]], st.view, "view");
+  seg("ctl-width", [["320", "320"], ["768", "768"], ["full", "Large"]], st.width, "width");
+  seg("ctl-mode", [["light", "Clair"], ["dark", "Sombre"]], mode(), "mode");
+}
+function stageVars() {
+  const d = dir(), c = d.colors[mode()];
+  const v = { "--c-bg": c.bg, "--c-raised": c.raised, "--c-text": c.text, "--c-muted": c.muted, "--c-decor": c.decor, "--c-accent": c.accent, "--c-danger": c.danger, "--c-warning": c.warning, "--c-success": c.success, "--c-line": `color-mix(in srgb, ${c.text} 16%, transparent)`, "--f-display": FONTS.display[d.fonts.display], "--f-text": FONTS.text[d.fonts.text], "--f-mono": FONTS.mono[d.fonts.mono], "--fs": d.fs, "--r": d.r, "--sp": d.sp, "--rad": `${d.rad}px`, "--dur": `${d.dur}ms` };
+  return Object.entries(v).map(([k, x]) => `${k}:${x}`).join(";");
+}
+function renderStage() {
+  const s = $("stage");
+  s.setAttribute("style", `${stageVars()};max-width:${st.width === "full" ? "100%" : st.width + "px"}`);
+  const a = ACHATS.find(x => x.slug === st.slug) || ACHATS[0];
+  s.innerHTML = `<div class="pv">${st.view === "list" ? RENDER[st.dir].list() : RENDER[st.dir].detail(a, etat(a))}</div>`;
+}
+function renderEditor() {
+  const d = dir(), m = mode(), c = d.colors[m];
+  $("tok-lead").textContent = `Direction ${st.dir}, ${d.nom}, thème ${m === "light" ? "clair" : "sombre"}. Chaque couleur de texte doit atteindre 4.5:1 ; « decor » n'a pas d'exigence car il ne porte jamais d'information. Change le thème au-dessus du prototype pour régler l'autre jeu.`;
+  $("tok-colors").innerHTML = Object.keys(ROLES).map(k => {
+    const needs = !["bg", "raised", "decor"].includes(k);
+    const cell = bgk => { if (!needs) return `<span class="ratio">—</span>`; const r = ratio(c[k], c[bgk]); return `<span class="ratio"><span class="${r >= 4.5 ? "pass" : "fail"}">${r.toFixed(2)}${r >= 4.5 ? " AA" : " échec"}</span></span>`; };
+    return `<tr><td class="tok-name">--color-${k}</td><td class="tok-role">${ROLES[k]}</td><td><div class="swatch"><input type="color" id="col-${k}" value="${c[k]}" data-col="${k}" aria-label="--color-${k}, sélecteur"><input type="text" id="hex-${k}" value="${c[k]}" data-hex="${k}" aria-label="--color-${k}, valeur hexadécimale" spellcheck="false"></div></td><td>${cell("bg")}</td><td>${cell("raised")}</td></tr>`;
+  }).join("");
+  const sel = (role, label) => `<label>${label}<select id="font-${role}" data-font="${role}">${Object.keys(FONTS[role]).map(f => `<option${d.fonts[role] === f ? " selected" : ""}>${f}</option>`).join("")}</select></label>`;
+  const rng = (key, label, min, max, step, unit) => `<label for="rng-${key}">${label}<input type="range" id="rng-${key}" data-rng="${key}" min="${min}" max="${max}" step="${step}" value="${d[key]}"><output for="rng-${key}">${d[key]}${unit}</output></label>`;
+  $("tok-fields").innerHTML = sel("display", "Police des titres") + sel("text", "Police du texte") + sel("mono", "Police des chiffres") + rng("fs", "Taille de base", 0.9, 1.2, 0.025, " rem") + rng("r", "Ratio de l'échelle", 1.125, 1.5, 0.005, "") + rng("sp", "Unité d'espacement", 0.75, 1.5, 0.05, " rem") + rng("rad", "Rayon", 0, 16, 1, " px") + rng("dur", "Durée des transitions", 0, 600, 20, " ms");
+  $("export").value = exportCss();
+}
+function exportCss() {
+  const d = dir(), L = d.colors.light, D = d.colors.dark;
+  const n = x => +x.toFixed(3);
+  const scale = { sm: n(d.fs / d.r), md: n(d.fs), lg: n(d.fs * d.r), xl: n(d.fs * d.r ** 2), "2xl": n(d.fs * d.r ** 3) };
+  const space = [0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4].map((x, i) => `  --space-${i + 1}: ${n(x * d.sp)}rem;`).join("\n");
+  const cols = o => Object.keys(ROLES).map(k => `  --color-${k}: ${o[k]};`).join("\n");
+  return `/* Garantix — tokens sémantiques. Direction ${st.dir} : ${d.nom}. Généré par l'atelier. */
+:root {
+${cols(L)}
+  --color-line: color-mix(in srgb, var(--color-text) 16%, transparent);
+
+  --font-display: ${FONTS.display[d.fonts.display]};
+  --font-text: ${FONTS.text[d.fonts.text]};
+  --font-mono: ${FONTS.mono[d.fonts.mono]};
+${Object.entries(scale).map(([k, v]) => `  --text-${k}: ${v}rem;`).join("\n")}
+  --leading-tight: 1.15;
+  --leading-body: 1.55;
+
+${space}
+  --radius: ${d.rad}px;
+  --border: 1px solid var(--color-line);
+  --focus-ring: 2px solid var(--color-accent);
+  --duration: ${d.dur}ms;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="clair"]) {
+${cols(D).replace(/^/gm, "  ")}
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="sombre"] {
+${cols(D)}
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --duration: 0ms; }
+}
+`;
+}
+function renderAll() { renderTabs(); renderNotes(); renderControls(); renderStage(); renderEditor(); }
+
+$("tabs").addEventListener("click", ev => { const t = ev.target.closest("[role=tab]"); if (!t) return; st.dir = t.id.slice(4); renderAll(); $(`tab-${st.dir}`).focus(); });
+$("tabs").addEventListener("keydown", ev => {
+  const keys = Object.keys(DIRS), i = keys.indexOf(st.dir);
+  const next = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: keys.length - 1 }[ev.key];
+  if (next === undefined) return;
+  ev.preventDefault(); st.dir = keys[(next + keys.length) % keys.length]; renderAll(); $(`tab-${st.dir}`).focus();
+});
+document.querySelector(".controls").addEventListener("click", ev => {
+  const b = ev.target.closest("button"); if (!b) return;
+  if (b.dataset.view) st.view = b.dataset.view;
+  if (b.dataset.width) st.width = b.dataset.width;
+  if (b.dataset.mode) { dir().mode = b.dataset.mode; save(); renderEditor(); }
+  renderControls(); renderStage();
+});
+$("stage").addEventListener("click", ev => {
+  const b = ev.target.closest("button"); if (!b) return;
+  if (b.dataset.open) { st.slug = b.dataset.open; st.view = "detail"; }
+  else if (b.dataset.back !== undefined) st.view = "list";
+  else if (b.dataset.follow) { const s = b.dataset.follow; st.suivis.has(s) ? st.suivis.delete(s) : st.suivis.add(s); }
+  else if (b.dataset.filtre) st.filtre = b.dataset.filtre;
+  else return;
+  const focusKey = b.dataset.follow ? `[data-follow="${b.dataset.follow}"]` : b.dataset.filtre ? `[data-filtre="${b.dataset.filtre}"]` : st.view === "detail" ? "[data-back]" : `[data-open="${st.slug}"]`;
+  renderControls(); renderStage();
+  const f = $("stage").querySelector(focusKey); if (f) f.focus();
+});
+$("tok-colors").addEventListener("input", ev => {
+  const el = ev.target, k = el.dataset.col || el.dataset.hex, v = el.value.trim();
+  if (!k || !valid(v)) return;
+  dir().colors[mode()][k] = v.toLowerCase(); save();
+  renderStage(); renderEditor();
+  const back = $(el.dataset.col ? `col-${k}` : `hex-${k}`); back.focus();
+  if (el.dataset.hex) back.setSelectionRange(back.value.length, back.value.length);
+});
+$("tok-fields").addEventListener("input", ev => {
+  const el = ev.target, d = dir();
+  if (el.dataset.font) d.fonts[el.dataset.font] = el.value;
+  if (el.dataset.rng) d[el.dataset.rng] = Number(el.value);
+  save(); renderStage();
+  if (el.dataset.rng) el.nextElementSibling.textContent = `${el.value}${{ fs: " rem", r: "", sp: " rem", rad: " px", dur: " ms" }[el.dataset.rng]}`;
+  $("export").value = exportCss();
+});
+$("copy").addEventListener("click", () => {
+  const msg = $("copy-msg"), ta = $("export");
+  navigator.clipboard.writeText(ta.value).then(() => { msg.textContent = "tokens.css copié."; }).catch(() => { ta.focus(); ta.select(); msg.textContent = "Copie refusée : le texte est sélectionné, utilise Cmd+C."; });
+});
+$("reset").addEventListener("click", () => {
+  DIRS[st.dir] = JSON.parse(JSON.stringify(ORIGIN[st.dir])); save(); renderAll();
+  $("copy-msg").textContent = `Direction ${st.dir} remise à ses valeurs d'origine.`;
+});
+renderAll();
+</script>
