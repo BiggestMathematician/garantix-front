@@ -8,9 +8,9 @@
 | UI | React 19 |
 | Routing | React Router (mode déclaratif) |
 | Styles | CSS Modules + custom properties (`src/styles/tokens.css`) |
-| Documentation composants | Storybook (React + Vite) |
+| Documentation composants | Storybook 10 (React + Vite), addons a11y, docs et MCP |
 | Tests | Vitest (domaine et stores) |
-| Qualité | ESLint (typescript-eslint, jsx-a11y), Stylelint (interdit les couleurs en dur hors tokens) |
+| Qualité | oxlint (fourni par le gabarit Vite, plugins react et jsx-a11y), Stylelint (interdit les valeurs en dur hors tokens) |
 | Hébergement | GitHub Pages, construit par GitHub Actions |
 | Node | ≥ 22 LTS (Vite et Storybook récents exigent ≥ 20.19) |
 
